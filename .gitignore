@@ -1,0 +1,42 @@
+# Python / packaging
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Testing / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# JetBrains / PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Project outputs (generated)
+results/
+tmp_diagnostics/
+
+# Generated notebooks / exports
+*.pkl
+*.parquet
+
+# Figures (generated)
+*.pdf
+*.png
+
+# Allow keeping small, intentional test fixtures/figures if you ever want them tracked
+# !tests/**/some_fixture.pdf
+

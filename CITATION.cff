@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it."
+title: "sim-score-study"
+type: software
+license: MIT
+abstract: "Simulation study codebase for score-based representations under source-level informative missingness."
+authors:
+  - family-names: "[fill]"
+    given-names: "[fill]"
+repository-code: "[fill: https://github.com/<org>/<repo>]"
+url: "[fill: project homepage or repo URL]"
+version: "0.1.0"
+date-released: "2026-03-22"
+keywords:
+  - simulation
+  - missing-data
+  - informative-missingness
+  - score-based-methods
+  - machine-learning
+
