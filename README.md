@@ -164,6 +164,15 @@ Common fields you may want to change:
 
 If you need to change any protocol values, edit `config.py` and rerun the pipeline.
 
+## Getting Started
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Cohen-Shahar/class-conditional-gof.git
+cd class-conditional-gof
+```
+
 ## Installation
 
 From the repository root:
