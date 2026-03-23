@@ -36,22 +36,6 @@ def parse_args() -> argparse.Namespace:
             "Off by default because it can make pickles much larger and more brittle across sklearn versions."
         ),
     )
-
-    # Robustness experiment: expert-model misspecification.
-    parser.add_argument(
-        "--expert-misspecification",
-        action="store_true",
-        help=(
-            "Generate data from the true model, but compute latent fits (L_hat/M_hat) and engineered features using a "
-            "replicate-specific misspecified expert model, where each expert parameter is independently perturbed by ±p."
-        ),
-    )
-    parser.add_argument(
-        "--expert-misspecification-pct",
-        type=float,
-        default=None,
-        help="Misspecification percentage p (default from config; paper uses 0.1 for ±10%).",
-    )
     return parser.parse_args()
 
 
@@ -59,14 +43,6 @@ def main() -> None:
     args = parse_args()
     config = get_config(args.config)
 
-    if args.expert_misspecification:
-        config.expert_misspecification = True
-        if args.expert_misspecification_pct is not None:
-            config.expert_misspecification_pct = float(args.expert_misspecification_pct)
-
-        # By default, keep the full method suite (same as the main study).
-        # If you want to restrict methods for faster misspecification runs,
-        # set `config.methods` manually in code (feature_columns_for_method honors it).
 
     output_root = Path(args.output_root)
 

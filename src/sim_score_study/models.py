@@ -30,19 +30,32 @@ def fit_predict_logistic(
     *,
     random_state: int,
 ) -> tuple[np.ndarray, pd.Series, object]:
+    lr_kwargs: dict[str, object] = {
+        "C": config.lr_C,
+        "fit_intercept": config.lr_fit_intercept,
+        "solver": "lbfgs",
+        "max_iter": config.lr_max_iter,
+        "random_state": int(random_state),
+    }
+
+    penalty = str(getattr(config, "lr_penalty", "l2")).strip().lower()
+    if penalty in {"", "l2"}:
+        # Keep sklearn defaults for L2 to avoid deprecation warnings.
+        pass
+    elif penalty in {"none", "null"}:
+        lr_kwargs["C"] = np.inf
+    else:
+        raise ValueError(
+            f"Unsupported lr_penalty={config.lr_penalty!r} with solver='lbfgs'. "
+            "Use 'l2' or 'none'."
+        )
+
     pipe = Pipeline(
         steps=[
             ("scale", StandardScaler()),
             (
                 "clf",
-                LogisticRegression(
-                    penalty=config.lr_penalty,
-                    C=config.lr_C,
-                    fit_intercept=config.lr_fit_intercept,
-                    solver="lbfgs",
-                    max_iter=config.lr_max_iter,
-                    random_state=int(random_state),
-                ),
+                LogisticRegression(**lr_kwargs),
             ),
         ]
     )

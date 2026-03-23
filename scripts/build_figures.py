@@ -31,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--results-root", required=True)
     parser.add_argument(
         "--figure",
-        default="all-except-score-diagnostics-and-misspecified",
+        default="all-except-score-diagnostics",
         choices=[
             "all",
             "all-except-score-diagnostics",
@@ -106,7 +106,13 @@ def main() -> None:
             lambda_high=lambda_high,
         )
 
-    if args.figure in {"all", "sim-misspecified"}:
+    should_plot_misspec = False
+    if args.figure == "sim-misspecified":
+        should_plot_misspec = True
+    elif args.figure in {"all", "all-except-score-diagnostics"}:
+        should_plot_misspec = bool(getattr(config, "expert_misspecification", False))
+
+    if should_plot_misspec:
         plot_misspecification_comparison_n10000(
             metrics,
             output_path=figs_dir / "fig_sim_misspecification_comparison_n10000.pdf",
@@ -139,3 +145,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

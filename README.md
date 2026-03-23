@@ -135,7 +135,6 @@ Common fields you may want to change:
 - `latent_M_mean`, `latent_M_sd`: parameters of `M ~ N(latent_M_mean, latent_M_sd^2)`.
 
 **Detection model parameters** (Eq. in paper: detection probability)
-- `alpha0`: detection intercept (used unless you provide `alpha0_levels`).
 - `alpha0_levels`: per-scenario calibrated intercepts, paired elementwise with `lambda_levels`.
 - `alpha_M`: coefficient multiplying magnitude `M` in the detection linear predictor.
 - `alpha_d`: coefficient multiplying distance `|L-r_s|` in the detection linear predictor.
@@ -148,7 +147,7 @@ Common fields you may want to change:
 - `sigma_x_levels`: observation noise standard deviation(s) (a single value in the paper protocol).
 
 **Malformed/invalid (Y=0) mechanism**
-- `invalid_dgp`: invalid-class mechanism (paper default is `"hybrid_mal_mix"`).
+- `invalid_dgp`: invalid-class mechanism (default is `"composite"`; alternative supported value is `"valid_latent_mcar_detection"`).
 - `invalid_p_mal_mix`: mixing probability between composite malformed vs irregular-missingness malformed.
 - `gamma`: per-source selector probability for the composite malformed mechanism.
 - `invalid_mcar_detection_prob`: MCAR detection probability used in the irregular-missingness malformed mechanism.
@@ -157,6 +156,8 @@ Common fields you may want to change:
 - `M_bounds`: bounds used by the optimizer for latent `M`.
 - `fit_n_jobs`: parallelism used inside single-cell fitting.
 - `optimizer_maxiter`, `optimizer_multistart_L`, `optimizer_reuse_empirical_init`: per-instance latent-state fitting controls.
+- `expert_misspecification`: whether to also run the misspecified-expert pipeline (default: `true`).
+- `expert_misspecification_pct`: misspecification size `p` for multiplicative perturbations `(1±p)`.
 
 **Predictive models**
 - `rf_*`: random-forest hyperparameters.
@@ -195,8 +196,7 @@ export PYTHONPATH=src
 
 The package ships with the following named configs:
 
-- `smoke`: tiny test run for debugging the full pipeline
-- `smoke_plots`: small run (3 replicates) that still generates the full set of paper-style plots/tables
+- `smoke`: small end-to-end run (3 replicates) for quick pipeline checks
 - `paper_light`: reduced-cost development run
 - `paper`: protocol-faithful run
 
@@ -217,6 +217,9 @@ Assume the output root is `results/paper`.
 
 By default, the simulation saves only the per-cell metric and coefficient summaries. This keeps the
 `cells/*.pkl` files small.
+
+By default, misspecification robustness is enabled from `config.py` (set via
+`expert_misspecification` and `expert_misspecification_pct`).
 
 ```bash
 python scripts/run_simulations.py --config paper --output-root results/paper
@@ -378,26 +381,29 @@ aggregates across replicates (and averages within replicate across lambda scenar
 - right: TNR at TPR = 0.95
 
 Output:
-- `results/paper_with_misspec_p10/figures/fig_sim_misspecification_comparison_n10000.pdf`
+- `results/paper_with_misspec_p25/figures/fig_sim_misspecification_comparison_n10000.pdf`
 
 Command:
 ```bash
 python scripts/build_figures.py \
-  --results-root results/paper_with_misspec_p10 \
+  --results-root results/paper_with_misspec_p25 \
   --figure sim-misspecified
 ```
 
-#### Generate all figures *except* score diagnostics and misspecification
+#### Generate all figures *except* score diagnostics
 
-This mode is the default and works with the default simulation outputs (no pooled scores stored, and
-no misspecification generated):
+This mode is the default. It includes the misspecification comparison figure when
+`expert_misspecification=true` in the run config.
+
+```bash
+python scripts/build_figures.py --results-root results/paper --figure all-except-score-diagnostics
+```
+
+If you want to explicitly skip misspecification figures, use:
 
 ```bash
 python scripts/build_figures.py --results-root results/paper --figure all-except-score-diagnostics-and-misspecified
 ```
-
-(You can still request all standard paper figures—excluding score diagnostics—via
-`--figure all-except-score-diagnostics`.)
 
 ### DT-Decomp (run separately)
 Run and export DT-Decomp candidates:
@@ -445,12 +451,12 @@ The `cells/` directory contains one serialized result file per `(replicate, n_tr
 To verify the code path end to end and inspect the actual figures quickly:
 
 ```bash
-python scripts/run_pipeline.py --config smoke_plots --output-root results/smoke_plots --n-jobs 1
+python scripts/run_pipeline.py --config smoke --output-root results/smoke --n-jobs 1
 ```
 
 Then inspect:
-- `results/smoke_plots/tables/`
-- `results/smoke_plots/figures/`
+- `results/smoke/tables/`
+- `results/smoke/figures/`
 
 ## Notes on manuscript integration
 
@@ -462,9 +468,9 @@ This project is released under the MIT License (see `LICENSE`).
 
 If you use this repository in academic work, please cite it using `CITATION.cff`.
 
-### Model misspecification robustness (optional)
+### Model misspecification robustness
 
-This repository can optionally evaluate robustness to **expert-model misspecification**.
+This repository can evaluate robustness to **expert-model misspecification**.
 In this experiment:
 
 - Training/test data are generated from the *true* model (the selected `--config`).
@@ -479,25 +485,29 @@ In this experiment:
 - Predictive models are trained/evaluated as usual. Results from the misspecified expert model are stored
   with a `__misspec` suffix on the method name (e.g., `LR-Decomp__misspec`).
 
-This mode is **off by default**.
+This mode is **enabled by default** and controlled in `src/sim_score_study/config.py`.
 
-#### Run the misspecification-robustness experiment
+#### Configure the misspecification-robustness experiment
+
+Set these fields in your selected config payload:
+
+- `expert_misspecification: true`
+- `expert_misspecification_pct: 0.25` for random ±25% multiplicative perturbations (current default).
+
+Then run simulations normally:
 
 ```bash
 python scripts/run_simulations.py \
   --config paper \
-  --output-root results/paper_with_misspec_p10 \
-  --expert-misspecification \
-  --expert-misspecification-pct 0.1
+  --output-root results/paper_with_misspec_p25
 ```
 
 Notes:
-- `--expert-misspecification-pct 0.1` corresponds to a random \(\pm 10\%\) multiplicative perturbation.
 - The replicate-specific perturbation factors are stored in each cell pickle under `payload["metadata"]["expert_misspecification_factors"]`.
 
 #### Build the robustness tables
 
-This produces **two tables** under `results/paper_with_misspec_p10/tables/`:
+This produces **two tables** under `results/paper_with_misspec_p25/tables/`:
 
 - `tab_sim_misspec_robustness.(csv|tex)`:
   AUROC under misspecification, with paired AUROC differences vs the baseline (same replicate/scenario).
@@ -506,6 +516,6 @@ This produces **two tables** under `results/paper_with_misspec_p10/tables/`:
 
 ```bash
 python scripts/build_tables.py \
-  --results-root results/paper_with_misspec_p10 \
+  --results-root results/paper_with_misspec_p25 \
   --table sim-misspec-robustness
 ```

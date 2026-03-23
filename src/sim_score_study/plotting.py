@@ -644,7 +644,7 @@ def plot_misspecification_comparison_n10000(
     if miss.empty:
         raise ValueError(
             f"No misspecified method rows found for n_train={n_train} (suffix='{misspec_suffix}'). "
-            "Did you run simulations with --expert-misspecification?"
+            "Set expert_misspecification=true in config.py and rerun simulations."
         )
 
     # Prepare minimal RHS and rename baseline metrics to avoid duplicate column labels.

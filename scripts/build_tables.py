@@ -130,7 +130,11 @@ def main() -> None:
         )
         coef_summary.to_csv(tables_dir / "tab_sim_coef_stability_full_tidy.csv", index=False)
 
-    if args.table in {"all", "sim-misspec-robustness"}:
+    should_build_misspec = (
+        args.table == "sim-misspec-robustness"
+        or (args.table == "all" and bool(getattr(config, "expert_misspecification", False)))
+    )
+    if should_build_misspec:
         misspec_metrics, _coef, _ = load_all_results(results_root, load_pooled_scores=False)
 
         tab_auroc, tab_other = build_misspec_robustness_tables(

@@ -287,7 +287,7 @@ def build_misspec_robustness_tables(
     if not misspec_methods:
         raise ValueError(
             f"No misspecified methods found (suffix='{misspec_suffix}'). "
-            "Did you run simulations with --expert-misspecification?"
+            "Set expert_misspecification=true in config.py and rerun simulations."
         )
 
     miss = df[df["method"].astype(str).str.endswith(misspec_suffix)].copy()

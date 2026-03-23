@@ -62,9 +62,9 @@ class StudyConfig:
     # Optional robustness experiment: use a misspecified expert model for fitting/features.
     # Data are still generated from the "true" config; only the expert model (used to compute
     # L_hat/M_hat and all engineered features) is perturbed.
-    expert_misspecification: bool = False
+    expert_misspecification: bool = True
     # Multiplicative perturbation size: each expert parameter is multiplied by (1±p).
-    expert_misspecification_pct: float = 0.1
+    expert_misspecification_pct: float = 0.25
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -139,9 +139,9 @@ def _base_config(name: str) -> Dict[str, Any]:
         "optimizer_multistart_L": [0.2, 0.5, 0.8],
         "optimizer_reuse_empirical_init": True,
 
-        # Robustness experiment defaults (off).
-        "expert_misspecification": False,
+        # Robustness experiment defaults (enabled by default).
         "expert_misspecification_pct": 0.25,
+        "expert_misspecification": True,
     }
 
 
@@ -158,28 +158,14 @@ _CONFIGS: Dict[str, Dict[str, Any]] = {
     # Quick end-to-end run to inspect the *actual* paper-format plots.
     # - All training sizes
     # - Two lambda scenarios (low/high)
-    # - Fixed sigma_x
     # - Only 3 Monte Carlo replicates
-    "smoke_plots": {
-        **_base_config("smoke_plots"),
+    "smoke": {
+        **_base_config("smoke"),
         "replicates": 3,
         "test_size": 500,
         "rf_n_estimators": 200,
         "optimizer_maxiter": 80,
     },
-
-    "smoke": {
-        **_base_config("smoke"),
-        "lambda_levels": [1.0, 2.0],
-        "alpha0_levels": [-2.2, -2.82],
-        "sigma_x_levels": [1.0],
-        "training_sizes": [100],
-        "test_size": 200,
-        "replicates": 2,
-        "rf_n_estimators": 100,
-        "optimizer_maxiter": 80,
-
-    }
 }
 
 

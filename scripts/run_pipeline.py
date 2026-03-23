@@ -16,7 +16,12 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run simulations, then build all tables and figures.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run simulations, then build all tables and figures. "
+            "Expert misspecification behavior is read from the selected config."
+        )
+    )
     parser.add_argument("--config", default="paper")
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--overwrite", action="store_true")
