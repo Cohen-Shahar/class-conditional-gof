@@ -19,21 +19,13 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Run simulations, then build all tables and figures. "
-            "Expert misspecification and pooled-score behavior are read from the selected config."
+            "Misspecification and score-diagnostics outputs are inferred from the selected config."
         )
     )
     parser.add_argument("--config", default="paper")
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--n-jobs", type=int, default=None)
-    parser.add_argument(
-        "--with-score-diagnostics",
-        action="store_true",
-        help=(
-            "Also build the score-diagnostics figure. "
-            "Requires run_with_pooled_scores=true in the selected config."
-        ),
-    )
     parser.add_argument(
         "--save-models",
         action="store_true",
@@ -65,14 +57,13 @@ def main() -> None:
     cmd2 = [sys.executable, str(this_dir / "build_tables.py"), "--results-root", args.output_root, "--table", "all"]
     subprocess.check_call(cmd2)
 
-    fig_choice = "all" if args.with_score_diagnostics else "all-except-score-diagnostics"
     cmd3 = [
         sys.executable,
         str(this_dir / "build_figures.py"),
         "--results-root",
         args.output_root,
         "--figure",
-        fig_choice,
+        "all",
     ]
     subprocess.check_call(cmd3)
 

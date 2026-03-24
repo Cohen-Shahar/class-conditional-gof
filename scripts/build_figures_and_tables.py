@@ -70,14 +70,13 @@ def main() -> None:
     ]
     subprocess.check_call(cmd_tables)
 
-    fig_choice = "all" if include_score_diagnostics else "all-except-score-diagnostics"
     cmd_figures = [
         sys.executable,
         str(this_dir / "build_figures.py"),
         "--results-root",
         str(results_root),
         "--figure",
-        fig_choice,
+        "all",
     ]
     subprocess.check_call(cmd_figures)
 

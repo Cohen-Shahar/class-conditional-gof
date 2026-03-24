@@ -45,59 +45,41 @@ Run simulation + table/figure post-processing in one command:
 ```bash
 python scripts/run_pipeline.py --config paper --output-root results/paper
 ```
+This runs the full pipeline for the main paper results, including misspecification robustness, and saves outputs under `results/paper/`.
 
-If you also want score diagnostics in the same run, use a pooled-score config and request diagnostics:
-
+If you want to test a quick run with fewer replicates, use the `smoke` config:
 ```bash
-python scripts/run_pipeline.py --config paper_pooled_scores --output-root results/paper_pooled_scores --with-score-diagnostics
+python scripts/run_pipeline.py --config smoke --output-root results/smoke
 ```
 
-## Misspecification and score components
+if you want a run similar to the main paper but light on replicates, use the `paper_light` config:
+```bash
+python scripts/run_pipeline.py --config paper_light --output-root results/paper_light
+```
 
-This implementation uses config-driven behavior (from `src/sim_score_study/config.py` and saved `results/.../config.json`):
+# Additional results:
+## Pooled scores and score diagnostics
+This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, that is saved `results/.../config.json`):
+- `run_with_pooled_scores` controls whether pooled per-example scores are saved.
+By default, the main pipeline does not save pooled per-example scores, which are needed for score diagnostics. This is to save memory and disk space.
+If you also want score diagnostics in the same run, use a pooled-score config:
 
-- `expert_misspecification` and `expert_misspecification_pct` control misspecified-expert robustness outputs.
-- `run_with_pooled_scores` controls whether pooled per-example scores are saved (needed for score diagnostics).
+```bash
+python scripts/run_pipeline.py --config paper_pooled_scores --output-root results/paper_pooled_scores
+```
 
-Defaults in current configs:
+## Misspecification
 
-- misspecification is enabled by default.
-- pooled scores are disabled by default.
-
-Available named configs:
-
-- `paper`
-- `paper_light`
-- `paper_pooled_scores` (20 replicates, pooled scores enabled)
-- `smoke`
-- `smoke_pooled_scores` (1 replicate, pooled scores enabled)
+This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, that is saved `results/.../config.json`):
+- `expert_misspecification` controls whether misspecified-expert robustness outputs are generated and saved.
+misspecification is enabled by default.
 
 Important memory/disk warning:
 
 - pooled scores add per-example payloads to each cell file and can substantially increase memory pressure and disk usage.
 
-## Generate figures/tables separately (optional)
 
-You can generate tables and figures separately for an existing results directory:
-
-```bash
-python scripts/build_tables.py --results-root results/paper --table all
-python scripts/build_figures.py --results-root results/paper --figure all-except-score-diagnostics
-```
-
-Notes:
-
-- with `--table all`, misspecification robustness tables are included automatically when `expert_misspecification=true` in `results-root/config.json`.
-- with `--figure all-except-score-diagnostics`, standard figures are generated, and misspecification figure is included automatically when `expert_misspecification=true`.
-- to include score diagnostics, run:
-
-```bash
-python scripts/build_figures.py --results-root results/paper_pooled_scores --figure all
-```
-
-(Requires `run_with_pooled_scores=true` in that run's config.)
-
-## Generate a single decision tree (optional)
+## Generate a single decision tree (Interpretability results)
 
 `DT-Decomp` is intentionally separate from the main pipeline. To generate a single tree setup:
 
@@ -115,6 +97,27 @@ python scripts/run_dt.py \
 ```
 
 This writes a manifest, metrics, and tree figures under `results/dt_single/`.
+
+## Generate tables and figures separately
+You can run simulations only (without post-processing) with:
+
+```bash
+python scripts/run_simulations.py --config paper --output-root results/paper
+```
+
+Then generate tables and figures from that existing results directory:
+
+```bash
+python scripts/build_tables.py --results-root results/paper --table all
+python scripts/build_figures.py --results-root results/paper --figure all
+```
+
+Notes:
+
+- with `--table all`, misspecification robustness tables are included automatically when `expert_misspecification=true` in `results-root/config.json`.
+- with `--figure all`, standard figures are always generated, and misspecification/score-diagnostics figures are included automatically based on `results-root/config.json`.
+
+You can also generate single tables or figures by specifying the desired subset of tables or figures (see `scripts/build_tables.py --help` and `scripts/build_figures.py --help` for details).
 
 ## Additional Information
 

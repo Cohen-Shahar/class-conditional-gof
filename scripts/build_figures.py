@@ -31,11 +31,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--results-root", required=True)
     parser.add_argument(
         "--figure",
-        default="all-except-score-diagnostics",
+        default="all",
         choices=[
             "all",
-            "all-except-score-diagnostics",
-            "all-except-score-diagnostics-and-misspecified",
             "sim-score-diagnostics",
             "sim-performance-vs-n",
             "sim-auroc-vs-n",
@@ -87,12 +85,13 @@ def main() -> None:
     lambda_low = min(config.lambda_levels)
     lambda_high = max(config.lambda_levels)
 
-    need_scores = args.figure in {"all", "sim-score-diagnostics"}
+    include_score_diagnostics = bool(getattr(config, "run_with_pooled_scores", False))
+    need_scores = args.figure == "sim-score-diagnostics" or (args.figure == "all" and include_score_diagnostics)
 
     metrics, _, pooled_scores = load_all_results(results_root, load_pooled_scores=need_scores)
     summary = summarize_metrics(metrics)
 
-    if args.figure in {"all", "sim-score-diagnostics"}:
+    if args.figure == "sim-score-diagnostics" or (args.figure == "all" and include_score_diagnostics):
         if pooled_scores is None:
             raise FileNotFoundError(
                 "No pooled score payloads were found under results-root/cells. "
@@ -106,11 +105,8 @@ def main() -> None:
             lambda_high=lambda_high,
         )
 
-    should_plot_misspec = False
-    if args.figure == "sim-misspecified":
-        should_plot_misspec = True
-    elif args.figure in {"all", "all-except-score-diagnostics"}:
-        should_plot_misspec = bool(getattr(config, "expert_misspecification", False))
+    include_misspec = bool(getattr(config, "expert_misspecification", False))
+    should_plot_misspec = args.figure == "sim-misspecified" or (args.figure == "all" and include_misspec)
 
     if should_plot_misspec:
         plot_misspecification_comparison_n10000(
@@ -119,7 +115,7 @@ def main() -> None:
             n_train=10_000,
         )
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-performance-vs-n"}:
+    if args.figure in {"all", "sim-performance-vs-n"}:
         plot_performance_vs_n_2x2(
             summary,
             output_path=figs_dir / "fig_sim_performance_vs_n.pdf",
@@ -127,19 +123,19 @@ def main() -> None:
             lambda_high=lambda_high,
         )
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-auroc-vs-n"}:
+    if args.figure in {"all", "sim-auroc-vs-n"}:
         plot_metric_vs_n(summary, metric_name="AUROC", output_path=figs_dir / "fig_sim_auroc_vs_n.pdf")
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-tnr-vs-n"}:
+    if args.figure in {"all", "sim-tnr-vs-n"}:
         plot_metric_vs_n(summary, metric_name="TNR@TPR95", output_path=figs_dir / "fig_sim_tnr_vs_n.pdf")
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-paired-gains"}:
+    if args.figure in {"all", "sim-paired-gains"}:
         plot_paired_gains(metrics, metric_name="AUROC", output_path=figs_dir / "fig_sim_paired_gains.pdf")
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-paired-gains-tnr"}:
+    if args.figure in {"all", "sim-paired-gains-tnr"}:
         plot_paired_gains(metrics, metric_name="TNR@TPR95", output_path=figs_dir / "fig_sim_paired_gains_tnr.pdf")
 
-    if args.figure in {"all", "all-except-score-diagnostics", "all-except-score-diagnostics-and-misspecified", "sim-paired-gains-combined"}:
+    if args.figure in {"all", "sim-paired-gains-combined"}:
         plot_paired_gains_combined(metrics, output_path=figs_dir / "fig_sim_paired_gains_combined.pdf")
 
 
