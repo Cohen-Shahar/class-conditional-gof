@@ -96,7 +96,7 @@ def main() -> None:
         if pooled_scores is None:
             raise FileNotFoundError(
                 "No pooled score payloads were found under results-root/cells. "
-                "Re-run simulations with --pooled-scores, or generate diagnostics separately."
+                "Re-run simulations with run_with_pooled_scores=true in config (e.g., paper_pooled_scores or smoke_pooled_scores)."
             )
         plot_score_diagnostics(
             pooled_scores=pooled_scores,

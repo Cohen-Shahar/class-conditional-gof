@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Run simulations, then build all tables and figures. "
-            "Expert misspecification behavior is read from the selected config."
+            "Expert misspecification and pooled-score behavior are read from the selected config."
         )
     )
     parser.add_argument("--config", default="paper")
@@ -29,7 +29,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--with-score-diagnostics",
         action="store_true",
-        help="Also save pooled scores during simulation and generate the score-diagnostics figure.",
+        help=(
+            "Also build the score-diagnostics figure. "
+            "Requires run_with_pooled_scores=true in the selected config."
+        ),
     )
     parser.add_argument(
         "--save-models",
@@ -55,8 +58,6 @@ def main() -> None:
         cmd1.append("--overwrite")
     if args.n_jobs is not None:
         cmd1.extend(["--n-jobs", str(args.n_jobs)])
-    if args.with_score_diagnostics:
-        cmd1.append("--pooled-scores")
     if args.save_models:
         cmd1.append("--save-models")
     subprocess.check_call(cmd1)

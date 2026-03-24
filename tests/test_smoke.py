@@ -6,7 +6,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from sim_score_study.config import get_config
+from sim_score_study.config import get_config, list_configs
 from sim_score_study.features import feature_columns_for_method
 
 EXPECTED_METHODS = {
@@ -22,7 +22,22 @@ EXPECTED_METHODS = {
 def test_smoke_config_exists():
     cfg = get_config("smoke")
     assert cfg.S == 50
-    assert len(cfg.training_sizes) == 1
+    assert cfg.replicates == 3
+    assert cfg.run_with_pooled_scores is False
+
+
+def test_pooled_score_configs_exist_and_match_requested_replicates():
+    names = set(list_configs())
+    assert "paper_pooled_scores" in names
+    assert "smoke_pooled_scores" in names
+
+    paper_cfg = get_config("paper_pooled_scores")
+    smoke_cfg = get_config("smoke_pooled_scores")
+
+    assert paper_cfg.replicates == 20
+    assert smoke_cfg.replicates == 1
+    assert paper_cfg.run_with_pooled_scores is True
+    assert smoke_cfg.run_with_pooled_scores is True
 
 
 def test_print_model_feature_sets(capsys):

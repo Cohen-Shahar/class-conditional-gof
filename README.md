@@ -156,6 +156,7 @@ Common fields you may want to change:
 - `M_bounds`: bounds used by the optimizer for latent `M`.
 - `fit_n_jobs`: parallelism used inside single-cell fitting.
 - `optimizer_maxiter`, `optimizer_multistart_L`, `optimizer_reuse_empirical_init`: per-instance latent-state fitting controls.
+- `run_with_pooled_scores`: whether to persist pooled per-example score payloads in cell files (default: `false`).
 - `expert_misspecification`: whether to also run the misspecified-expert pipeline (default: `true`).
 - `expert_misspecification_pct`: misspecification size `p` for multiplicative perturbations `(1±p)`.
 
@@ -197,8 +198,10 @@ export PYTHONPATH=src
 The package ships with the following named configs:
 
 - `smoke`: small end-to-end run (3 replicates) for quick pipeline checks
+- `smoke_pooled_scores`: smoke-like run with pooled scores enabled (`replicates=1`)
 - `paper_light`: reduced-cost development run
 - `paper`: protocol-faithful run
+- `paper_pooled_scores`: paper-like run with pooled scores enabled (`replicates=20`)
 
 List them from Python:
 
@@ -221,15 +224,17 @@ By default, the simulation saves only the per-cell metric and coefficient summar
 By default, misspecification robustness is enabled from `config.py` (set via
 `expert_misspecification` and `expert_misspecification_pct`).
 
+Pooled-score storage is also config-driven via `run_with_pooled_scores`.
+
 ```bash
 python scripts/run_simulations.py --config paper --output-root results/paper
 ```
 
-If you also want to generate the score-diagnostics figure (`fig_sim_score_diagnostics.pdf`), re-run
-(or run) the simulations with pooled scores enabled:
+If you want score-diagnostics-ready outputs, use one of the pooled-score configs:
 
 ```bash
-python scripts/run_simulations.py --config paper --output-root results/paper --pooled-scores
+python scripts/run_simulations.py --config paper_pooled_scores --output-root results/paper_pooled_scores
+python scripts/run_simulations.py --config smoke_pooled_scores --output-root results/smoke_pooled_scores
 ```
 
 Note: pooled scores add a large per-example payload to each cell file and can significantly increase
@@ -296,11 +301,11 @@ python scripts/build_tables.py --results-root results/paper --table sim-coef-sta
 
 #### Figure `fig_sim_score_diagnostics.pdf`
 Output:
-- `results/paper/figures/fig_sim_score_diagnostics.pdf`
+- `results/paper_pooled_scores/figures/fig_sim_score_diagnostics.pdf`
 
 Command:
 ```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-score-diagnostics
+python scripts/build_figures.py --results-root results/paper_pooled_scores --figure sim-score-diagnostics
 ```
 
 Implementation details:
@@ -421,6 +426,12 @@ If you want the whole study in one call:
 python scripts/run_pipeline.py --config paper --output-root results/paper
 ```
 
+To also build score diagnostics, use a pooled-score config and request diagnostics:
+
+```bash
+python scripts/run_pipeline.py --config paper_pooled_scores --output-root results/paper_pooled_scores --with-score-diagnostics
+```
+
 ## Output conventions
 
 After a full run, the output tree is:
@@ -452,11 +463,13 @@ To verify the code path end to end and inspect the actual figures quickly:
 
 ```bash
 python scripts/run_pipeline.py --config smoke --output-root results/smoke --n-jobs 1
+python scripts/run_pipeline.py --config smoke_pooled_scores --output-root results/smoke_pooled_scores --n-jobs 1 --with-score-diagnostics
 ```
 
 Then inspect:
 - `results/smoke/tables/`
 - `results/smoke/figures/`
+- `results/smoke_pooled_scores/figures/fig_sim_score_diagnostics.pdf`
 
 ## Notes on manuscript integration
 

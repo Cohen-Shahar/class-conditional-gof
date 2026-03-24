@@ -24,11 +24,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing cell files")
     parser.add_argument("--n-jobs", type=int, default=None, help="Parallel jobs for latent-state fitting")
     parser.add_argument(
-        "--pooled-scores",
-        action="store_true",
-        help="Store per-example pooled score features in each cell .pkl (required for fig_sim_score_diagnostics).",
-    )
-    parser.add_argument(
         "--save-models",
         action="store_true",
         help=(
@@ -42,7 +37,6 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config = get_config(args.config)
-
 
     output_root = Path(args.output_root)
 
@@ -77,7 +71,7 @@ def main() -> None:
                     output_root=output_root,
                     overwrite=args.overwrite,
                     n_jobs=args.n_jobs,
-                    save_pooled_scores=args.pooled_scores,
+                    save_pooled_scores=bool(getattr(config, "run_with_pooled_scores", False)),
                     save_models=args.save_models,
                 )
 

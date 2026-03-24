@@ -59,6 +59,9 @@ class StudyConfig:
     optimizer_multistart_L: List[float]
     optimizer_reuse_empirical_init: bool
 
+    # Persist pooled test-score payloads in each cell output (used by score diagnostics figure).
+    run_with_pooled_scores: bool = False
+
     # Optional robustness experiment: use a misspecified expert model for fitting/features.
     # Data are still generated from the "true" config; only the expert model (used to compute
     # L_hat/M_hat and all engineered features) is perturbed.
@@ -138,6 +141,7 @@ def _base_config(name: str) -> Dict[str, Any]:
         "optimizer_maxiter": 250,
         "optimizer_multistart_L": [0.2, 0.5, 0.8],
         "optimizer_reuse_empirical_init": True,
+        "run_with_pooled_scores": False,
 
         # Robustness experiment defaults (enabled by default).
         "expert_misspecification_pct": 0.25,
@@ -147,6 +151,12 @@ def _base_config(name: str) -> Dict[str, Any]:
 
 _CONFIGS: Dict[str, Dict[str, Any]] = {
     "paper": _base_config("paper"),
+
+    "paper_pooled_scores": {
+        **_base_config("paper_pooled_scores"),
+        "replicates": 20,
+        "run_with_pooled_scores": True,
+    },
 
     "paper_light": {
         **_base_config("paper_light"),
@@ -165,6 +175,15 @@ _CONFIGS: Dict[str, Dict[str, Any]] = {
         "test_size": 500,
         "rf_n_estimators": 200,
         "optimizer_maxiter": 80,
+    },
+
+    "smoke_pooled_scores": {
+        **_base_config("smoke_pooled_scores"),
+        "replicates": 1,
+        "test_size": 500,
+        "rf_n_estimators": 200,
+        "optimizer_maxiter": 80,
+        "run_with_pooled_scores": True,
     },
 }
 
