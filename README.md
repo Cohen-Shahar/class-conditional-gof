@@ -119,9 +119,9 @@ Notes:
 
 You can also generate single tables or figures by specifying the desired subset of tables or figures (see `scripts/build_tables.py --help` and `scripts/build_figures.py --help` for details).
 
-## Additional Information
+# Additional Information
 
-### Repository layout
+## Repository layout
 
 ```text
 sim_score_study/
@@ -148,9 +148,9 @@ sim_score_study/
     └── plotting.py
 ```
 
-### What is implemented from the protocol
+## What is implemented from the protocol
 
-#### Data-generating process
+### Data-generating process
 - Binary labels `Y in {0,1}` with `Y=1` = valid and `Y=0` = invalid.
 - `S=50` sources with equally spaced fixed source locations on `[0,1]`.
 - Source-specific offsets `alpha0s ~ U[0,1]` are drawn once at the start of each replicate and held fixed within that replicate.
@@ -169,12 +169,12 @@ sim_score_study/
 
   This mixed malformed-event mechanism is the default simulation used in the paper.
 
-#### Expert-guided fitting
+### Expert-guided fitting
 - The modeled class is the valid class (`Y=1`).
 - During fitting, all class-1 structural quantities are treated as known except the per-instance latent state `(L_i, M_i)`.
 - The code maximizes the class-1 observed-data log-likelihood for each instance using bounded L-BFGS-B with multiple starts.
 
-#### Scenario grid
+### Scenario grid
 The main paper protocol varies:
 - the missingness informativeness parameter `lambda` (two levels: low/high), and
 - the training sample size.
@@ -185,7 +185,7 @@ This is configured via elementwise pairing:
 - `lambda_levels = [lambda_low, lambda_high]`
 - `alpha0_levels = [alpha0_low, alpha0_high]`
 
-#### Score features
+### Score features
 The code computes all requested features:
 - `u_det`
 - `u_nondet`
@@ -198,7 +198,7 @@ and the auxiliary feature vector:
 - `resid_mean`
 - `resid_sd`
 
-#### Methods compared
+### Methods compared
 The code computes metrics for the following methods:
 - `LR-Decomp`
 - `LR-Total` (**computed and stored**, but **not used** in manuscript tables and figures)
@@ -207,11 +207,11 @@ The code computes metrics for the following methods:
 - `RF-Raw`
 - `RF-Raw+Features`
 
-#### DT-Decomp (implemented separately)
+### DT-Decomp (implemented separately)
 DT-Decomp is implemented separately from the main pipeline.
 Use `scripts/run_dt.py` to fit DT-Decomp on a grid of settings and export representative tree figures under `results/dt/`.
 
-#### Metrics
+### Metrics
 The code computes:
 - AUROC
 - AUPRC
@@ -219,16 +219,16 @@ The code computes:
 - Log loss
 - TNR at TPR = 0.95
 
-#### Paired Monte Carlo design
+### Paired Monte Carlo design
 Within each replicate and scenario, every method is evaluated on the exact same simulated training and test data.
 
-### Reproducibility
+## Reproducibility
 
 - Per-replicate source designs are saved under `source_designs/source_design__rep_XXX.json`.
 - Train/test datasets differ by seeded generators derived from the replicate, training size, and scenario.
 - Random forests are seeded per cell.
 - The simulation is exactly reproducible given the config and package versions.
 
-### License and authorship
+## License and authorship
 
 This project is released under the MIT License (see `LICENSE`).
