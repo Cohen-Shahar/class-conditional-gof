@@ -40,28 +40,34 @@ export PYTHONPATH=src
 
 ### 3) Run the full pipeline
 
-Run simulation + table/figure post-processing in one command:
+Run simulation plus post-processing (tables and figures) in one command:
 
 ```bash
 python scripts/run_pipeline.py --config paper --output-root results/paper
 ```
+
 This runs the full pipeline for the main paper results, including misspecification robustness, and saves outputs under `results/paper/`.
 
 If you want to test a quick run with fewer replicates, use the `smoke` config:
+
 ```bash
 python scripts/run_pipeline.py --config smoke --output-root results/smoke
 ```
 
-if you want a run similar to the main paper but light on replicates, use the `paper_light` config:
+If you want a run similar to the main paper but lighter in replicates, use the `paper_light` config:
+
 ```bash
 python scripts/run_pipeline.py --config paper_light --output-root results/paper_light
 ```
 
 # Additional results:
 ## Pooled scores and score diagnostics
-This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, that is saved `results/.../config.json`):
+
+This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, saved in `results/.../config.json`):
+
 - `run_with_pooled_scores` controls whether pooled per-example scores are saved.
-By default, the main pipeline does not save pooled per-example scores, which are needed for score diagnostics. This is to save memory and disk space.
+
+By default, the main pipeline does not save pooled per-example scores, which are needed for score diagnostics, to reduce memory and disk usage.
 If you also want score diagnostics in the same run, use a pooled-score config:
 
 ```bash
@@ -70,9 +76,11 @@ python scripts/run_pipeline.py --config paper_pooled_scores --output-root result
 
 ## Misspecification
 
-This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, that is saved `results/.../config.json`):
+This implementation uses config-driven behavior (from `src/sim_score_study/config.py`, saved in `results/.../config.json`):
+
 - `expert_misspecification` controls whether misspecified-expert robustness outputs are generated and saved.
-misspecification is enabled by default.
+
+Misspecification is enabled by default.
 
 Important memory/disk warning:
 
@@ -117,7 +125,7 @@ Notes:
 - with `--table all`, misspecification robustness tables are included automatically when `expert_misspecification=true` in `results-root/config.json`.
 - with `--figure all`, standard figures are always generated, and misspecification/score-diagnostics figures are included automatically based on `results-root/config.json`.
 
-You can also generate single tables or figures by specifying the desired subset of tables or figures (see `scripts/build_tables.py --help` and `scripts/build_figures.py --help` for details).
+You can also generate single tables or figures by specifying a subset (see `scripts/build_tables.py --help` and `scripts/build_figures.py --help` for details).
 
 # Additional Information
 
@@ -152,11 +160,10 @@ sim_score_study/
 
 ### Data-generating process
 - Binary labels `Y in {0,1}` with `Y=1` = valid and `Y=0` = invalid.
-- `S=50` sources with equally spaced fixed source locations on `[0,1]`.
+- `S=50` sources with source locations drawn i.i.d. from `U[0,1]` once per replicate and held fixed within that replicate.
 - Source-specific offsets `alpha0s ~ U[0,1]` are drawn once at the start of each replicate and held fixed within that replicate.
-- Valid events are generated from a single latent state `(L, M)`.
+- Valid-event latent states are sampled as `L ~ U[latent_L_low, latent_L_high]` and `M ~ N(latent_M_mean, latent_M_sd^2)`, one pair `(L, M)` per event.
 - Invalid events are generated using a **hybrid malformed-event mechanism** controlled by `invalid_p_mal_mix`:
-
   - With probability `invalid_p_mal_mix` ("composite" malformed events):
     evidence is mixed across sources from **two** pseudo-events `(L^A, M^A)` and `(L^B, M^B)`.
     For each source `s`, a selector `C^(s) ~ Bernoulli(gamma)` chooses which pseudo-event generates
@@ -201,11 +208,11 @@ and the auxiliary feature vector:
 ### Methods compared
 The code computes metrics for the following methods:
 - `LR-Decomp`
-- `LR-Total` (**computed and stored**, but **not used** in manuscript tables and figures)
 - `LR-Obs`
 - `LR-Baseline`
 - `RF-Raw`
 - `RF-Raw+Features`
+- `LR-Total` (**computed and stored**, but **not used** in manuscript tables and figures)
 
 ### DT-Decomp (implemented separately)
 DT-Decomp is implemented separately from the main pipeline.
