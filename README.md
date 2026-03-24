@@ -229,6 +229,45 @@ The code computes:
 ### Paired Monte Carlo design
 Within each replicate and scenario, every method is evaluated on the exact same simulated training and test data.
 
+## Testing and diagnostic scripts (not main paper results)
+
+The files under `tests/*.py` and `scripts/simple_tests.py` are for development sanity checks and diagnostics. They help verify that core mechanics are working as expected after code changes, but they are **not** part of the pipeline used to produce the main paper tables/figures.
+
+### What they do
+
+- `tests/test_smoke.py`: quick end-to-end smoke checks on a tiny configuration to catch major regressions.
+- `tests/test_source_design.py`: validates saved source-design behavior and reproducibility-related assumptions.
+- `tests/plot_detection_heatmap.py`: diagnostic visualization of detection behavior.
+- `tests/plot_detection_vs_magnitude.py`: diagnostic visualization of detection vs. event magnitude.
+- `scripts/simple_tests.py`: lightweight script-level checks for core simulation components and data flow.
+- `scripts/report_convergence_rate.py`: runs repeated latent-state fits on simulated data and reports optimizer failure/convergence rate.
+
+### How to run them
+
+Run the pytest-style tests:
+
+```bash
+pytest tests/test_smoke.py tests/test_source_design.py
+```
+
+Run diagnostic scripts directly:
+
+```bash
+python tests/plot_detection_heatmap.py
+python tests/plot_detection_vs_magnitude.py
+python scripts/simple_tests.py
+python scripts/report_convergence_rate.py --config smoke --n_samples 1000 --n_events 1
+```
+
+If you installed with `pip install -r requirements.txt` (non-editable), make sure `PYTHONPATH=src` is set before running the commands.
+
+### Why they are needed
+
+- Catch regressions early when changing simulation, fitting, or reporting code.
+- Validate reproducibility assumptions (for example, source-design persistence and deterministic seeds).
+- Provide quick visual/behavioral diagnostics without running the full expensive pipeline.
+- Quantify latent-state optimizer stability (failure rate) under a chosen config.
+
 ## Reproducibility
 
 - Per-replicate source designs are saved under `source_designs/source_design__rep_XXX.json`.
