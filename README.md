@@ -23,6 +23,7 @@ sim_score_study/
 │   ├── run_simulations.py
 │   ├── build_tables.py
 │   ├── build_figures.py
+│   ├── build_figures_and_tables.py
 │   ├── run_pipeline.py
 │   └── run_dt.py
 └── src/sim_score_study/
@@ -131,7 +132,7 @@ Common fields you may want to change:
 - `min_detecting_sources`: rejection threshold (instances with fewer detections are resampled).
 
 **Latent-state prior**
-- `latent_L_low`, `latent_L_high`: bounds of `L ~ U[latent_L_low, latent_L_high]`.
+- `latent_L_low`, `latent_L_high`: bounds of `L ~ U[latent_Low, latent_L_high]`.
 - `latent_M_mean`, `latent_M_sd`: parameters of `M ~ N(latent_M_mean, latent_M_sd^2)`.
 
 **Detection model parameters** (Eq. in paper: detection probability)
@@ -212,203 +213,58 @@ print(list_configs())
 PY
 ```
 
-## Exact commands to generate every requested figure and table by name
+## Run simulations
 
 Assume the output root is `results/paper`.
 
-### Step 1: run the simulation cells
-
-By default, the simulation saves only the per-cell metric and coefficient summaries. This keeps the
-`cells/*.pkl` files small.
-
-By default, misspecification robustness is enabled from `config.py` (set via
-`expert_misspecification` and `expert_misspecification_pct`).
-
-Pooled-score storage is also config-driven via `run_with_pooled_scores`.
+By default, the simulation saves per-cell metric/coefficient summaries and uses misspecification settings from config (`expert_misspecification`, `expert_misspecification_pct`).
 
 ```bash
 python scripts/run_simulations.py --config paper --output-root results/paper
 ```
 
-If you want score-diagnostics-ready outputs, use one of the pooled-score configs:
+If you want score-diagnostics-ready outputs, use a pooled-score config:
 
 ```bash
 python scripts/run_simulations.py --config paper_pooled_scores --output-root results/paper_pooled_scores
 python scripts/run_simulations.py --config smoke_pooled_scores --output-root results/smoke_pooled_scores
 ```
 
-Note: pooled scores add a large per-example payload to each cell file and can significantly increase
-disk usage.
-
-Optional: You can also store the fitted sklearn model objects (logistic-regression / random-forest)
-inside each cell pickle for ad-hoc diagnostics. This is **off by default** because it can make the
-`.pkl` files much larger (and can be brittle across sklearn version changes).
+Optional model-object export remains available:
 
 ```bash
 python scripts/run_simulations.py --config paper --output-root results/paper --save-models
 ```
 
-This creates the per-cell Monte Carlo outputs under:
+## Build all figures and tables from a results directory
 
-```text
-results/paper/cells/
-```
-
-### Step 2: generate tables
-
-#### Table `tab:sim-settings`
-Outputs:
-- `results/paper/tables/tab_sim_settings.csv`
-- `results/paper/tables/tab_sim_settings.tex`
-
-Command:
-```bash
-python scripts/build_tables.py --results-root results/paper --table sim-settings
-```
-
-#### Table `tab:sim-main-discrimination`
-Outputs:
-- `results/paper/tables/tab_sim_main_discrimination.csv`
-- `results/paper/tables/tab_sim_main_discrimination.tex`
-
-Command:
-```bash
-python scripts/build_tables.py --results-root results/paper --table sim-main-discrimination
-```
-
-#### Table `tab:sim-main-probability`
-Outputs:
-- `results/paper/tables/tab_sim_main_probability.csv`
-- `results/paper/tables/tab_sim_main_probability.tex`
-
-Command:
-```bash
-python scripts/build_tables.py --results-root results/paper --table sim-main-probability
-```
-
-#### Table `tab:sim-coef-stability`
-Outputs:
-- `results/paper/tables/tab_sim_coef_stability.csv`
-- `results/paper/tables/tab_sim_coef_stability.tex`
-- `results/paper/tables/tab_sim_coef_stability_full_tidy.csv`
-
-Command:
-```bash
-python scripts/build_tables.py --results-root results/paper --table sim-coef-stability
-```
-
-### Step 3: generate figures
-
-#### Figure `fig_sim_score_diagnostics.pdf`
-Output:
-- `results/paper_pooled_scores/figures/fig_sim_score_diagnostics.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper_pooled_scores --figure sim-score-diagnostics
-```
-
-Implementation details:
-- pools test-set extracted score values across replicates,
-- uses the smallest and largest configured `lambda`,
-- produces a 4 x 2 panel figure with rows for `u_det`, `u_nondet`, `u_obs`, `u_tot`.
-
-#### Figure `fig_sim_performance_vs_n.pdf`
-Output:
-- `results/paper/figures/fig_sim_performance_vs_n.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-performance-vs-n
-```
-
-This is the paper-style 2×2 grid: rows = (AUROC, TNR at TPR=0.95), columns = (λ_low, λ_high).
-
-#### Figure `fig_sim_auroc_vs_n.pdf`
-Output:
-- `results/paper/figures/fig_sim_auroc_vs_n.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-auroc-vs-n
-```
-
-#### Figure `fig_sim_tnr_vs_n.pdf`
-Output:
-- `results/paper/figures/fig_sim_tnr_vs_n.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-tnr-vs-n
-```
-
-#### Figure `fig_sim_paired_gains.pdf`
-Output:
-- `results/paper/figures/fig_sim_paired_gains.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-paired-gains
-```
-
-This figure reports paired gains for:
-- `LR-Decomp - LR-Obs`
-- `RF-Raw+Features - RF-Raw`
-
-#### Optional TNR version of paired gains
-Output:
-- `results/paper/figures/fig_sim_paired_gains_tnr.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-paired-gains-tnr
-```
-
-#### Combined paired gains (AUROC + TNR@TPR95)
-Output:
-- `results/paper/figures/fig_sim_paired_gains_combined.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py --results-root results/paper --figure sim-paired-gains-combined
-```
-
-This is a single 2×2 grid (rows = AUROC / TNR@TPR95, cols = the two paired comparisons).
-
-#### Optional: misspecification comparison figure (n = 10,000)
-
-This figure compares the *same four methods* under a correctly specified vs misspecified expert model
-(using the misspecification experiment described above). It uses only the `n_train = 10,000` cells,
-aggregates across replicates (and averages within replicate across lambda scenarios), and produces a
-2-panel plot:
-
-- left: AUROC
-- right: TNR at TPR = 0.95
-
-Output:
-- `results/paper_with_misspec_p25/figures/fig_sim_misspecification_comparison_n10000.pdf`
-
-Command:
-```bash
-python scripts/build_figures.py \
-  --results-root results/paper_with_misspec_p25 \
-  --figure sim-misspecified
-```
-
-#### Generate all figures *except* score diagnostics
-
-This mode is the default. It includes the misspecification comparison figure when
-`expert_misspecification=true` in the run config.
+After simulations finish, generate all tables and figures with one command:
 
 ```bash
-python scripts/build_figures.py --results-root results/paper --figure all-except-score-diagnostics
+python scripts/build_figures_and_tables.py --results-root "Directory_name"
 ```
 
-If you want to explicitly skip misspecification figures, use:
+Example:
 
 ```bash
-python scripts/build_figures.py --results-root results/paper --figure all-except-score-diagnostics-and-misspecified
+python scripts/build_figures_and_tables.py --results-root results/paper
+python scripts/build_figures_and_tables.py --results-root results/paper_pooled_scores
 ```
+
+The script reads `Directory_name/config.json` and prints whether:
+
+- misspecification outputs are enabled (from `expert_misspecification`), and
+- score-diagnostics output is enabled (from `run_with_pooled_scores`).
+
+Behavior:
+
+- It always builds the main tables/figures.
+- It includes misspecification tables/figures only when `expert_misspecification=true`.
+- It includes `fig_sim_score_diagnostics.pdf` only when `run_with_pooled_scores=true`.
+
+Warning on memory/disk usage:
+
+- pooled scores store per-example payloads inside each cell pickle and can substantially increase disk usage and memory pressure.
 
 ### DT-Decomp (run separately)
 Run and export DT-Decomp candidates:
@@ -420,13 +276,13 @@ python scripts/run_dt.py --config paper --output-root results/dt
 The DT script saves candidate trees and a manifest under `results/dt/`.
 
 ### One-command full pipeline
-If you want the whole study in one call:
+If you want simulation + post-processing in one call:
 
 ```bash
 python scripts/run_pipeline.py --config paper --output-root results/paper
 ```
 
-To also build score diagnostics, use a pooled-score config and request diagnostics:
+To include score diagnostics in one call, use a pooled-score config and request diagnostics:
 
 ```bash
 python scripts/run_pipeline.py --config paper_pooled_scores --output-root results/paper_pooled_scores --with-score-diagnostics
@@ -518,17 +374,12 @@ python scripts/run_simulations.py \
 Notes:
 - The replicate-specific perturbation factors are stored in each cell pickle under `payload["metadata"]["expert_misspecification_factors"]`.
 
-#### Build the robustness tables
+#### Post-processing misspecification outputs
 
-This produces **two tables** under `results/paper_with_misspec_p25/tables/`:
-
-- `tab_sim_misspec_robustness.(csv|tex)`:
-  AUROC under misspecification, with paired AUROC differences vs the baseline (same replicate/scenario).
-- `tab_sim_misspec_robustness_other_metrics.(csv|tex)`:
-  the same paired comparisons for `TNR@TPR95`, `AUPRC`, `Brier`, and `LogLoss`.
+Use the unified post-processing command for the run directory:
 
 ```bash
-python scripts/build_tables.py \
-  --results-root results/paper_with_misspec_p25 \
-  --table sim-misspec-robustness
+python scripts/build_figures_and_tables.py --results-root results/paper_with_misspec_p25
 ```
+
+When `expert_misspecification=true`, this command includes the misspecification robustness tables and the misspecification comparison figure automatically.
