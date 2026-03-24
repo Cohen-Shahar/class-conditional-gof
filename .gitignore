@@ -29,6 +29,9 @@ htmlcov/
 results/
 tmp_diagnostics/
 
+tests/detection_summary.csv
+tests/**/summary.csv
+
 # Generated notebooks / exports
 *.pkl
 *.parquet
