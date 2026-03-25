@@ -7,8 +7,7 @@ This repository contains the simulation-study code used in the paper above.
 If you use this codebase, please cite:
 
 ```text
-[Paper citation placeholder]
-Author(s), "Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness: An Application to Seismic Monitoring", [Venue], [Year].
+[BibTeX reference will be added once publication metadata is finalized.]
 ```
 
 You can also use `CITATION.cff` (update with final publication metadata as needed).
