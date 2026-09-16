@@ -127,8 +127,11 @@ def summarize_coef_stability(coefficients: pd.DataFrame) -> pd.DataFrame:
 
 def build_sim_settings_table(config: StudyConfig) -> pd.DataFrame:
     rows = [
-        ("Number of sources S", "50, fixed across instances"),
-        ("Source locations r_s", "Equally spaced on [0,1], fixed across instances"),
+        ("Number of sources S", f"{config.S}"),
+        (
+            "Source locations r_s",
+            "U[0,1], drawn once per replicate and fixed across all events, training sizes, and lambda levels",
+        ),
         ("Class prevalence π1 = P(Y=1)", f"{config.prevalence:g}"),
         ("Latent prior for L", "U[0,1]"),
         ("Latent prior for M", f"N({config.latent_M_mean:g}, {config.latent_M_sd:g}^2)"),
@@ -136,7 +139,10 @@ def build_sim_settings_table(config: StudyConfig) -> pd.DataFrame:
             "Detection-model parameters (alpha0_levels, alpha_M, alpha_d)",
             f"([{', '.join(f'{x:g}' for x in config.alpha0_levels)}], {config.alpha_M:g}, {config.alpha_d:g})",
         ),
-        ("Source-specific noise parameters alpha0s", "U[0,1], fixed across instances"),
+        (
+            "Source-specific noise parameters alpha0s",
+            "U[0,1], drawn once per replicate (independently of r_s) and fixed across all events, training sizes, and lambda levels",
+        ),
         (
             "Observation-model parameters (beta0, beta_M, beta_d)",
             f"({config.beta0:g}, {config.beta_M:g}, {config.beta_d:g})",

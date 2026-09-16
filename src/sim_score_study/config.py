@@ -125,7 +125,7 @@ def _base_config(name: str) -> Dict[str, Any]:
         "invalid_p_mal_mix": 0.5,
         "training_sizes": [100, 1_000, 10_000],
         "test_size": 5_000,
-        "replicates": 500,
+        "replicates": 300,
         "min_detecting_sources": 2,
         "M_bounds": [0.0, 20.0],
         "fit_n_jobs": 1,

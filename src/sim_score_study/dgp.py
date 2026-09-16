@@ -6,7 +6,7 @@ from typing import Dict
 import numpy as np
 from scipy.special import expit
 
-from .config import StudyConfig, sample_fixed_source_noise
+from .config import StudyConfig
 
 
 @dataclass
@@ -52,8 +52,10 @@ def build_source_design(
     # - Deterministic within replicate (via design_seed), different across replicates.
     locations = rng.uniform(0.0, 1.0, size=config.S)
 
-    # Keep using the helper distribution, but tie it to this replicate's seed.
-    alpha0s = sample_fixed_source_noise(config.S, seed=design_seed)
+    # Source-specific detection shifts: independent i.i.d. U[0,1] draws from the
+    # SAME generator, after the location draw. (Previously this re-seeded a fresh
+    # generator with design_seed, which made alpha0s identical to locations.)
+    alpha0s = rng.uniform(0.0, 1.0, size=config.S)
     return SourceDesign(locations=locations, alpha0s=alpha0s, seed=design_seed)
 
 
