@@ -277,6 +277,13 @@ If you installed with `pip install -r requirements.txt` (non-editable), make sur
 - Train/test datasets differ by seeded generators derived from the replicate, training size, and scenario.
 - Random forests are seeded per cell.
 - The simulation is exactly reproducible given the config and package versions.
+- The paper results use the `paper` config (300 replicates, expert misspecification at 25%); the score-diagnostics
+  figure uses `paper_pooled_scores` (20 replicates); the interpretability tree uses `scripts/run_dt.py` defaults
+  (lambda = 2, n_train = 100000, max_depth = 4, min_samples_leaf = 1).
+- Change log: on 2026-09-16 the source design was corrected so that per-source detection shifts (`alpha0s`) are
+  drawn independently of source locations (previously both were drawn from a generator re-seeded with the same
+  design seed, making them identical). All paper results were regenerated after this fix. Results produced with
+  earlier versions of the code are not comparable.
 
 ## License and authorship
 
