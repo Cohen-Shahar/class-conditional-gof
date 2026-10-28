@@ -30,37 +30,39 @@ from sim_score_study.utils import ensure_dir, save_json
 # ---------------------------
 # In-file configuration block
 # ---------------------------
-# Edit this dict if you prefer changing the DT grid in the file instead of the CLI.
-# Any key set to None keeps the existing CLI default behavior.
+# Optional overrides. Any key set to None (the default) leaves the CLI flag in
+# charge; a non-None value REPLACES the corresponding CLI flag. The paper settings
+# live in the argparse defaults below, so `python scripts/run_dt.py` with no flags
+# reproduces the paper tree, and explicit flags are honored.
 DT_DEFAULTS: dict[str, object] = {
     # I/O
-    "base_config": "paper",
+    "base_config": None,
     "output_root": None,  # e.g., str(ROOT / "results" / "dt")
 
     # Replication
-    "replicates": 1,
-    "seed_offset": 0,
+    "replicates": None,
+    "seed_offset": None,
 
     # DGP grid (comma-separated strings or Python lists)
-    "invalid_dgp": "composite",
-    "gamma": 0.5,  # e.g., "0.3,0.5" or [0.3, 0.5]
-    "invalid_mcar_detection_prob": 0.1,
-    "invalid_p_mal_mix": 0.5,
+    "invalid_dgp": None,
+    "gamma": None,  # e.g., "0.3,0.5" or [0.3, 0.5]
+    "invalid_mcar_detection_prob": None,
+    "invalid_p_mal_mix": None,
 
     # Scenario grid
-    "lambda_values": [2.0],
-    "sigma_x_values": 1.0,
-    "n_train_values": "100000",
-    "test_size": 5000,
+    "lambda_values": None,
+    "sigma_x_values": None,
+    "n_train_values": None,
+    "test_size": None,
 
     # DT hyperparameter grid
-    "max_depth": [4],  # use "None" for unlimited depth
-    "min_samples_leaf": "1",
-    "criterion": "gini",
+    "max_depth": None,  # use "None" for unlimited depth
+    "min_samples_leaf": None,
+    "criterion": None,
 
     # Outputs
-    "save_tree": True,
-    "save_metrics_per_replicate": True,
+    "save_tree": None,
+    "save_metrics_per_replicate": None,
 }
 
 
@@ -142,7 +144,8 @@ def parse_args() -> argparse.Namespace:
         description=(
             "Run decision-tree grids (DT on decomposed engineered features) and write figures/metrics under results/dt. "
             "This is intentionally separate from the main simulation protocol.\n\n"
-            "You can configure the grid either via CLI flags or by editing DT_DEFAULTS in this file."
+            "Defaults reproduce the paper tree (lambda=2, n_train=100000, test_size=5000, depth=4, leaf=1). "
+            "Override via CLI flags, or by setting non-None values in DT_DEFAULTS in this file."
         )
     )
     # Accept both --base-config (legacy) and --config (alias used by other scripts).
@@ -159,22 +162,23 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--invalid-p-mal-mix", dest="invalid_p_mal_mix", default=None)
 
     # Scenario grid
-    p.add_argument("--lambda", dest="lambda_values", default=None)
+    p.add_argument("--lambda", dest="lambda_values", default="2.0")
     p.add_argument("--sigma-x", dest="sigma_x_values", default=None)
-    p.add_argument("--n-train", dest="n_train_values", default="1000,10000")
-    p.add_argument("--test-size", dest="test_size", type=int, default=1000)
+    p.add_argument("--n-train", dest="n_train_values", default="100000")
+    p.add_argument("--test-size", dest="test_size", type=int, default=5000)
 
     # DT hyperparameter grid
-    p.add_argument("--max-depth", dest="max_depth", default="2,3,4,5")
-    p.add_argument("--min-samples-leaf", dest="min_samples_leaf", default="50")
+    p.add_argument("--max-depth", dest="max_depth", default="4")
+    p.add_argument("--min-samples-leaf", dest="min_samples_leaf", default="1")
     p.add_argument("--criterion", dest="criterion", default="gini")
 
-    p.add_argument("--save-tree", dest="save_tree", action="store_true")
+    p.add_argument("--save-tree", dest="save_tree", action="store_true", help="Save tree figures (default: on).")
+    p.add_argument("--no-save-tree", dest="save_tree", action="store_false", help="Disable tree figures.")
     p.add_argument(
         "--save-metrics-per-replicate",
         dest="save_metrics_per_replicate",
         action="store_true",
-        help="Write tables/dt_metrics_per_replicate.csv (enabled by default via DT_DEFAULTS).",
+        help="Write tables/dt_metrics_per_replicate.csv (default: on).",
     )
     p.add_argument(
         "--no-save-metrics-per-replicate",
@@ -182,7 +186,7 @@ def parse_args() -> argparse.Namespace:
         action="store_false",
         help="Disable writing per-replicate metrics CSV.",
     )
-    p.set_defaults(save_metrics_per_replicate=False)
+    p.set_defaults(save_tree=True, save_metrics_per_replicate=True)
 
     return p.parse_args()
 

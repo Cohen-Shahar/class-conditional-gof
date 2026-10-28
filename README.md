@@ -97,13 +97,15 @@ python scripts/run_dt.py \
   --replicates 1 \
   --lambda 2.0 \
   --n-train 100000 \
-  --max-depth 3 \
-  --min-samples-leaf 50 \
+  --max-depth 4 \
+  --min-samples-leaf 1 \
   --criterion gini \
   --save-tree
 ```
 
 This writes a manifest, metrics, and tree figures under `results/dt_single/`.
+
+These flags are also the script defaults, so `python scripts/run_dt.py` with no flags produces the same tree under `results/dt/`. Tree figures are named by their settings (e.g. `tree__rep_001__..._depth_4__leaf_1__crit_gini.pdf`).
 
 ## Generate tables and figures separately
 You can run simulations only (without post-processing) with:
