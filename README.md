@@ -30,12 +30,14 @@ pip install -U pip
 pip install -e .
 ```
 
-Alternative non-editable install:
+To reproduce the paper results exactly, install the pinned versions used for the published runs (Python 3.12):
 
 ```bash
 pip install -r requirements.txt
-export PYTHONPATH=src
+pip install -e . --no-deps
 ```
+
+`pyproject.toml` lists looser lower bounds for general use; `requirements.txt` pins the exact versions.
 
 ### 3) Run the full pipeline
 
