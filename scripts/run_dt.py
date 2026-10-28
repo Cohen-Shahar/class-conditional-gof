@@ -54,8 +54,8 @@ DT_DEFAULTS: dict[str, object] = {
     "test_size": 5000,
 
     # DT hyperparameter grid
-    "max_depth": [3],  # use "None" for unlimited depth
-    "min_samples_leaf": "50",
+    "max_depth": [4],  # use "None" for unlimited depth
+    "min_samples_leaf": "1",
     "criterion": "gini",
 
     # Outputs
@@ -312,8 +312,8 @@ def main() -> None:
             train = generate_dataset(spec.n_train, spec.lambda_value, spec.sigma_x, cfg, design, rng_train)
             test = generate_dataset(spec.test_size, spec.lambda_value, spec.sigma_x, cfg, design, rng_test)
 
-            train_fit = fit_latent_states(train["X"], train["D"], spec.lambda_value, spec.sigma_x, cfg, design, n_jobs=1)
-            test_fit = fit_latent_states(test["X"], test["D"], spec.lambda_value, spec.sigma_x, cfg, design, n_jobs=1)
+            train_fit = fit_latent_states(train["X"], train["D"], spec.lambda_value, spec.sigma_x, cfg, design, n_jobs=8)
+            test_fit = fit_latent_states(test["X"], test["D"], spec.lambda_value, spec.sigma_x, cfg, design, n_jobs=8)
 
             train_bundle = compute_feature_bundle(train, train_fit, spec.lambda_value, spec.sigma_x, cfg, design)
             test_bundle = compute_feature_bundle(test, test_fit, spec.lambda_value, spec.sigma_x, cfg, design)
