@@ -201,12 +201,3 @@ def get_config(name: str) -> StudyConfig:
     payload.pop("gamma_label", None)
     payload.pop("alpha0", None)
     return StudyConfig(**payload)
-
-
-def build_source_locations(S: int) -> np.ndarray:
-    return np.linspace(0.0, 1.0, S)
-
-
-def sample_fixed_source_noise(S: int, seed: int) -> np.ndarray:
-    rng = np.random.default_rng(seed)
-    return rng.uniform(0.0, 1.0, size=S)
