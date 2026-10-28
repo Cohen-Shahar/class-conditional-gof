@@ -43,3 +43,6 @@ tests/**/summary.csv
 # Allow keeping small, intentional test fixtures/figures if you ever want them tracked
 # !tests/**/some_fixture.pdf
 
+
+# Run logs
+logs/
