@@ -93,14 +93,13 @@ class StudyConfig:
 
 def _base_config(name: str) -> Dict[str, Any]:
     # NOTE:
-    # The protocol leaves several entries as [fill in]. The values below are
-    # reasonable defaults chosen so that:
+    # Calibration values used in the paper. They were chosen so that:
     # 1) detection is neither trivial nor degenerate;
     # 2) informative missingness increases with lambda; and
     # 3) the observation signal degrades as sigma_x grows.
     #
-    # If the paper finalizes different calibration values, change only these
-    # defaults and rerun the full pipeline. All figures/tables will update.
+    # To run a different calibration, change only these defaults and rerun the
+    # full pipeline; all figures/tables will update.
     return {
         "name": name,
         "random_seed": 20260301,

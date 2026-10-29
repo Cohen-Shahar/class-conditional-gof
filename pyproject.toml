@@ -4,9 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sim-score-study"
-version = "0.1.0"
+version = "1.0.0"
 description = "Simulation study for score-based representations under source-level informative missingness."
 readme = "README.md"
+authors = [{ name = "Shahar Cohen" }]
+license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",
@@ -18,6 +20,10 @@ dependencies = [
     "pyarrow>=14.0",
     "Jinja2>=3.1",
 ]
+
+[project.urls]
+Repository = "https://github.com/Cohen-Shahar/class-conditional-gof"
+Paper = "https://arxiv.org/abs/2604.14809"
 
 [tool.setuptools.packages.find]
 where = ["src"]

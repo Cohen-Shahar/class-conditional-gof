@@ -1,20 +1,41 @@
 cff-version: 1.2.0
-message: "If you use this code, please cite it."
-title: "sim-score-study"
+message: "If you use this code, please cite the paper below (preferred) and/or this software."
+title: "class-conditional-gof"
 type: software
 license: MIT
-abstract: "Simulation study codebase for score-based representations under source-level informative missingness."
+abstract: "Simulation-study code for expert-guided class-conditional goodness-of-fit scores for interpretable classification with informative missingness."
 authors:
-  - family-names: "[fill]"
-    given-names: "[fill]"
-repository-code: "[fill: https://github.com/<org>/<repo>]"
-url: "[fill: project homepage or repo URL]"
-version: "0.1.0"
-date-released: "2026-03-22"
+  - family-names: "Cohen"
+    given-names: "Shahar"
+repository-code: "https://github.com/Cohen-Shahar/class-conditional-gof"
+url: "https://github.com/Cohen-Shahar/class-conditional-gof"
+version: "1.0.0"
+date-released: "2026-10-29"
 keywords:
   - simulation
   - missing-data
   - informative-missingness
-  - score-based-methods
+  - goodness-of-fit
+  - interpretable-classification
   - machine-learning
-
+preferred-citation:
+  type: article
+  title: "Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness"
+  authors:
+    - family-names: "Cohen"
+      given-names: "Shahar"
+    - family-names: "Steinberg"
+      given-names: "David M."
+    - family-names: "Radzyner"
+      given-names: "Yael"
+    - family-names: "Ben Horin"
+      given-names: "Yochai"
+  year: 2026
+  month: 4
+  journal: "arXiv preprint"
+  doi: "10.48550/arXiv.2604.14809"
+  url: "https://arxiv.org/abs/2604.14809"
+  identifiers:
+    - type: other
+      value: "arXiv:2604.14809"
+      description: "arXiv identifier (primary class stat.ML)"

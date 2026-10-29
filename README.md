@@ -1,16 +1,29 @@
-# Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness: An Application to Seismic Monitoring
+# Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness
 
-This repository contains the simulation-study code used in the paper above.
+This repository contains the simulation-study code used in the paper:
+
+> Shahar Cohen, David M. Steinberg, Yael Radzyner, Yochai Ben Horin.
+> *Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness.*
+> arXiv:2604.14809 [stat.ML], 2026. https://arxiv.org/abs/2604.14809
 
 ## Citation
 
-If you use this codebase, please cite:
+If you use this codebase, please cite the paper:
 
-```text
-[BibTeX reference will be added once publication metadata is finalized.]
+```bibtex
+@misc{cohen2026expertguided,
+  title         = {Expert-Guided Class-Conditional Goodness-of-Fit Scores for Interpretable Classification with Informative Missingness},
+  author        = {Cohen, Shahar and Steinberg, David M. and Radzyner, Yael and Ben Horin, Yochai},
+  year          = {2026},
+  eprint        = {2604.14809},
+  archivePrefix = {arXiv},
+  primaryClass  = {stat.ML},
+  doi           = {10.48550/arXiv.2604.14809},
+  url           = {https://arxiv.org/abs/2604.14809}
+}
 ```
 
-You can also use `CITATION.cff` (update with final publication metadata as needed).
+`CITATION.cff` carries the same metadata for GitHub's "Cite this repository" feature.
 
 ## How to use
 
@@ -135,28 +148,39 @@ You can also generate single tables or figures by specifying a subset (see `scri
 ## Repository layout
 
 ```text
-sim_score_study/
-├── pyproject.toml
-├── requirements.txt
+class-conditional-gof/
 ├── README.md
+├── LICENSE
+├── CITATION.cff
+├── pyproject.toml
+├── requirements.txt              # pinned versions used for the paper runs
 ├── scripts/
+│   ├── run_pipeline.py           # simulations -> tables -> figures (main entry point)
 │   ├── run_simulations.py
 │   ├── build_tables.py
 │   ├── build_figures.py
 │   ├── build_figures_and_tables.py
-│   ├── run_pipeline.py
-│   └── run_dt.py
-└── src/sim_score_study/
-    ├── __init__.py
-    ├── config.py
-    ├── dgp.py
-    ├── fitting.py
-    ├── features.py
-    ├── metrics.py
-    ├── models.py
-    ├── experiment.py
-    ├── reporting.py
-    └── plotting.py
+│   ├── run_dt.py                 # DT-Decomp interpretability tree (separate from the main pipeline)
+│   ├── report_convergence_rate.py
+│   └── simple_tests.py
+├── src/sim_score_study/
+│   ├── __init__.py
+│   ├── config.py                 # named configs (paper, paper_pooled_scores, paper_light, smoke, ...)
+│   ├── dgp.py                    # data-generating process and per-replicate source designs
+│   ├── fitting.py                # latent-state fitting
+│   ├── features.py               # goodness-of-fit score features
+│   ├── misspecification.py       # expert-model misspecification perturbations
+│   ├── models.py                 # classifiers compared
+│   ├── metrics.py
+│   ├── experiment.py             # one simulation cell
+│   ├── reporting.py              # load cells, summarize, tables
+│   ├── plotting.py               # figures
+│   └── utils.py
+└── tests/
+    ├── test_smoke.py
+    ├── test_source_design.py     # regression test for the source-design fix
+    ├── plot_detection_heatmap.py
+    └── plot_detection_vs_magnitude.py
 ```
 
 ## What is implemented from the protocol
